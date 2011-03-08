@@ -1,0 +1,14 @@
+#labels FAQ,Struts
+* Why ZEST?
+
+ZEST is aimed to provide a lightweight and high-performance RESTful framework that enables MVC and REST for Web applications.
+
+ZEST is also designed to work seamlessly with [http://www.zkoss.org ZK].
+
+* Why not [http://struts.apache.org/ Struts]?
+
+The MVC concept of ZEST is inspired from Struts. However, Struts is too complex. Many features are useless when working with a modern framework, such as [http://www.zkoss.org ZK].
+
+* Is ZEST suggested for ZK applications?
+
+With ZEST, you could provide an additional REST or MVC layer on top of ZK, such that URL will be logic names (e.g., `http://foo.com/accounts/list`) rather than ZUML files (e.g., `http://foo.com/accounts/list.zul`). On the hand, you don't need ZEST if you prefer to work on ZUML files directly.
