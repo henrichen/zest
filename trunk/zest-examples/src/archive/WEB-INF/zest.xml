@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- zest.xml
+	Purpose:
+		The configuration of ZEST examples
+	Description:
+		
+	History:
+		Wed Mar  2 18:26:19 TST 2011, Created by tomyeh
+
+Copyright (C) 2011 Potix Corporation. All Rights Reserved.
+-->
+
+<zest>
+    <!-- Specifies the extension that ZEST shall handle.
+    	Default: empty (means ZEST handles only paths without any extension)
+    	To specify multiple extensions, you could separate them by comma.
+    	Example, <extensions>, .do, .action</extensions> means
+    	no extension, .do and .action extensions.
+   	<extensions></extensions>
+    -->
+    <!-- Specifies the error handler
+    	Default: none (the exception is thrown up without any processing)
+    	
+	<error-handler-class></error-handler-class>
+	-->
+
+	<!-- An action definition
+		path: a request path (where regular expressions are allowed)
+	-->
+	<action path="/hello" class="org.zkoss.zest.examples.hello.HelloWorldAction">
+		<result name="success">/hello/HelloWorld.jsp</result>
+	</action>
+
+	<!-- A RESTful example
+	<action path="/rest" method="${request.method}"
+	class="org.zkoss.zest.examples.rest.RESTfulAction">
+		<result>/rest/Result.jsp</result>
+	</action>
+	-->
+</zest>
