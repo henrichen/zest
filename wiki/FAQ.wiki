@@ -11,8 +11,10 @@ The MVC concept of ZEST is inspired from Struts. However, Struts is too complex.
 
 * Is ZEST suggested for ZK applications?
 
-With ZEST, you could provide an additional REST or MVC layer on top of ZK, such that URL will be logic names (e.g., `http://foo.com/accounts/list`) rather than ZUML files (e.g., `http://foo.com/accounts/list.zul`). On the hand, you don't need ZEST if you prefer to work on ZUML files directly.
+With ZEST, you could provide an additional REST or MVC layer on top of ZK, such that URL will be logic names (e.g., `http://foo.com/accounts/list`) rather than ZUML files (e.g., `http://foo.com/accounts/list.zul`).
 
-* Does ZEST requires ZK?
+On the hand, you don't need ZEST if you prefer to work on ZUML files directly.
 
-No, it works with any Web framework.
+* Does ZEST require ZK?
+
+No, it works with any Web framework. However, it requires two jar files from ZK, zcommon.jar and zweb.jar.
