@@ -33,6 +33,7 @@ public class ActionContextImpl implements ActionContext {
 	private ExpressionFactory _expf;
 	private final HttpServletRequest _request;
 	private final FunctionMapper _mapper;
+	private final VariableResolver _resolver;
 	private final String _path;
 
 	public ActionContextImpl(HttpServletRequest request, FunctionMapper mapper) {
@@ -51,6 +52,12 @@ public class ActionContextImpl implements ActionContext {
 		}
 		_path = path;
 		_mapper = mapper;
+		_resolver = new VariableResolver() {
+			public Object resolveVariable(String name) {
+				if ("request".equals(name)) return _request;
+				return _request.getAttribute(name);
+			}
+		};
 	}
 	@Override
 	public HttpServletRequest getServletRequest() {
@@ -78,15 +85,13 @@ public class ActionContextImpl implements ActionContext {
 			_expf = Expressions.newExpressionFactory();
 		return _expf;
 	}
-	/** Returns the function mapper, or null if not available.
-	 */
+	@Override
 	public FunctionMapper getFunctionMapper() {
 		return _mapper;
 	}
-	/** Returns the variable resolver (never null).
-	 */
+	@Override
 	public VariableResolver getVariableResolver() {
-		return null; //TODO
+		return _resolver;
 	}
 	/** Instantiate a XEL context.
 	 * Don't reuse it since it has attributes (that shall not be kept

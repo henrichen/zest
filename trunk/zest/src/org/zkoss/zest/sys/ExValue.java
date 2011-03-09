@@ -10,7 +10,7 @@
 Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 
 */
-package org.zkoss.zest.sys.util;
+package org.zkoss.zest.sys;
 
 import org.zkoss.lang.Classes;
 import org.zkoss.xel.Expression;
@@ -89,14 +89,14 @@ public class ExValue implements java.io.Serializable {
 
 	/** Returns the value after evaluation.
 	 */
-	public Object getValue(ActionContext rc)
+	public Object getValue(ActionContext ac)
 	throws XelException {
 		if (_expr == null)
 			if (_value != null && _value.indexOf("${") >= 0)
-				_expr = rc.parseExpression(_value, _expected);
+				_expr = ac.parseExpression(_value, _expected);
 			else
 				_expr = Expressions.DUMMY_EXPRESSION; //to denote not-an-expr
-		return _expr == Expressions.DUMMY_EXPRESSION ? coerce(): rc.evaluate(_expr);
+		return _expr == Expressions.DUMMY_EXPRESSION ? coerce(): ac.evaluate(_expr);
 	}
 	private Object coerce() {
 		if (_coercedVal == Objects.UNKNOWN)

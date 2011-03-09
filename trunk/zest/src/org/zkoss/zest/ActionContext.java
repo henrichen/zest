@@ -14,6 +14,8 @@ package org.zkoss.zest;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.zkoss.xel.FunctionMapper;
+import org.zkoss.xel.VariableResolver;
 import org.zkoss.xel.Expression;
 import org.zkoss.xel.XelException;
 
@@ -52,4 +54,11 @@ public interface ActionContext {
 	 */
 	public Object evaluate(Expression expression)
 	throws XelException;
+
+	/** Returns the function mapper, or null if not available.
+	 */
+	public FunctionMapper getFunctionMapper();
+	/** Returns the variable resolver (never null).
+	 */
+	public VariableResolver getVariableResolver();
 }
