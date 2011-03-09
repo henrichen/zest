@@ -12,6 +12,8 @@ Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 */
 package org.zkoss.zest.sys.impl;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
@@ -24,8 +26,12 @@ import org.zkoss.util.resource.Locator;
 import org.zkoss.util.logging.Log;
 import org.zkoss.idom.Document;
 import org.zkoss.idom.Element;
+import org.zkoss.idom.Item;
 import org.zkoss.idom.input.SAXBuilder;
 import org.zkoss.idom.util.IDOMs;
+import org.zkoss.xel.taglib.Taglibs;
+import org.zkoss.xel.taglib.Taglib;
+import org.zkoss.xel.util.MethodFunction;
 
 import org.zkoss.zest.sys.*;
 import org.zkoss.zest.ZestException;
@@ -55,6 +61,8 @@ public class ParserImpl implements Parser {
 	 */
 	public Configuration parse(Element root, Locator loc) throws Exception {
 		final List<ActionDefinition> defs = new LinkedList<ActionDefinition>();
+		final List<Taglib> taglibs = new LinkedList<Taglib>();
+		final List<Object[]> xelmtds = new LinkedList<Object[]>();
 		String[] exts = null;
 		ErrorHandler errh = null;
 		for (Iterator it = root.getElements().iterator(); it.hasNext();) {
@@ -63,27 +71,71 @@ public class ParserImpl implements Parser {
 			if ("action".equals(elnm)) {
 				defs.add(parseAction(el));
 			} else if ("error-handler-class".equals(elnm)) {
-				errh = (ErrorHandler)Classes.newInstanceByThread(el.getText(true));
+				final String clsnm = el.getText(true);
+				noELnorEmpty(elnm, clsnm, el);
+				errh = (ErrorHandler)Classes.newInstanceByThread(clsnm);
 			} else if ("extensions".equals(elnm)) {
-				exts = parseExtensions(el.getText(true));
+				final String s = el.getText(true);
+				noEL(elnm, s, el);
+				exts = parseExtensions(s);
+			} else if ("taglib".equals(elnm)) {
+				final String uri = IDOMs.getRequiredAttributeValue(el, "uri");
+				noELnorEmpty("uri", uri, el);
+				final String prefix = IDOMs.getRequiredAttributeValue(el, "prefix");
+				noELnorEmpty("prefix", prefix, el);
+				taglibs.add(new Taglib(prefix, uri));
+			} else if ("xel-method".equals(elnm)) {
+				parseXelMethod(xelmtds, el);
 			}
 		}
 		return new ConfigurationImpl(
 			defs.toArray(new ActionDefinition[defs.size()]),
-			exts != null ? exts: new String[] {""}, errh);
+			exts != null ? exts: new String[] {""}, errh,
+			taglibs != null && !taglibs.isEmpty() ?
+				Taglibs.getFunctionMapper(taglibs, null, xelmtds, loc): null);
 	}
 	//parse action
 	private static ActionDefinition parseAction(Element el)
 	throws Exception {
-		final Class<?> klass = Classes.forNameByThread(IDOMs.getRequiredAttributeValue(el, "class"));
+		final String clsnm = IDOMs.getRequiredAttributeValue(el, "class");
+		noELnorEmpty("class", clsnm, el);
+		final Class<?> klass = Classes.forNameByThread(clsnm);
 		final Map<String, String> results = new HashMap<String, String>();
 		for (Iterator it = el.getElements("result").iterator(); it.hasNext();)
 			parseResult((Element)it.next(), results);
-		return new ActionDefinitionImpl(IDOMs.getRequiredAttributeValue(el, "path"),
-			klass, el.getAttributeValue("method"), results);
+		final String path = IDOMs.getRequiredAttributeValue(el, "path");
+		noELnorEmpty("path", path, el);
+		return new ActionDefinitionImpl(path, klass, el.getAttributeValue("method"), results);
 	}
 	private static void parseResult(Element el, Map<String, String> results) {
-		results.put(el.getAttributeValue("name"), el.getText(true));
+		final String nm = el.getAttributeValue("name");
+		noELnorEmpty("name", nm, el);
+		results.put(nm, el.getText(true));
+	}
+	/** Parse the XEL method. */
+	private static void parseXelMethod(List<Object[]> xelmtds, Element el)
+	throws Exception {
+		final String prefix = IDOMs.getRequiredAttributeValue(el, "prefix");
+		noELnorEmpty("prefix", prefix, el);
+		final String nm = IDOMs.getRequiredAttributeValue(el, "name");
+		noELnorEmpty("name", nm, el);
+		final String clsnm = IDOMs.getRequiredAttributeValue(el, "class");
+		noELnorEmpty("class", clsnm, el);
+		final String sig = IDOMs.getRequiredAttributeValue(el, "signature");
+		noELnorEmpty("signature", sig, el);
+
+		final Method mtd;
+		try {
+			final Class cls = Classes.forNameByThread(clsnm);
+			mtd = Classes.getMethodBySignature(cls, sig, null);
+		} catch (ClassNotFoundException ex) {
+			throw new ZestException("Class not found: "+clsnm+", "+el.getLocator());
+		} catch (Exception ex) {
+			throw new ZestException("Method not found: "+sig+" in "+clsnm+", "+el.getLocator());
+		}
+		if ((mtd.getModifiers() & Modifier.STATIC) == 0)
+			throw new ZestException("Not a static method: "+mtd+", "+el.getLocator());
+		xelmtds.add(new Object[] {prefix, nm, new MethodFunction(mtd)});
 	}
 	//parse extensions
 	private static String[] parseExtensions(String extensions) {
@@ -96,5 +148,20 @@ public class ParserImpl implements Parser {
 				exts[j] = '.' + exts[j];
 		}
 		return exts;
+	}
+	/** Whether a string is null or empty. */
+	private static boolean isEmpty(String s) {
+		return s == null || s.length() == 0;
+	}
+	private static void noELnorEmpty(String nm, String val, Item item)
+	throws ZestException {
+		if (isEmpty(val))
+			throw new ZestException(nm + " cannot be empty, "+item.getLocator());
+		noEL(nm, val, item);
+	}
+	private static void noEL(String nm, String val, Item item)
+	throws ZestException {
+		if (val != null && val.indexOf("${") >= 0)
+			throw new ZestException(nm+" does not support EL expressions, "+item.getLocator());
 	}
 }

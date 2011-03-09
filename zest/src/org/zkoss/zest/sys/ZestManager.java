@@ -88,8 +88,8 @@ public class ZestManager {
 		if (_config == null)
 			return false;
 	
-		final ActionContext rc = new ActionContextImpl(request, null); //TODO
-		final String path = rc.getRequestPath();
+		final ActionContext ac = new ActionContextImpl(request, _config.getFunctionMapper());
+		final String path = ac.getRequestPath();
 		if (extensionIgnored(path, _config.getExtensions()))
 			return false;
 
@@ -98,13 +98,12 @@ public class ZestManager {
 			final ActionDefinition def = defs[j];
 			Object action = null;
 			try {
-				action = def.getAction(rc);
+				action = def.getAction(ac);
 				if (action != null) {
 					request.setAttribute("action", action);
-					request.setAttribute("request", request);
-					final String result = def.execute(rc, action);
+					final String result = def.execute(ac, action);
 					request.setAttribute("result", result);
-					final String uri = def.getView(rc, result);
+					final String uri = def.getView(ac, result);
 					if (uri == null)
 						throw new ZestException("URI not specified for "+action+" under result is "+result+", when handling "+path);
 					Servlets.forward(_ctx, request, response, uri);
@@ -113,7 +112,7 @@ public class ZestManager {
 			} catch (Throwable ex) {
 				final ErrorHandler errh = _config.getErrorHandler();
 				if (errh != null)
-					ex = errh.onError(rc, action, ex);
+					ex = errh.onError(ac, action, ex);
 				if (ex != null)
 					throw ZestException.Aide.wrap(ex, "Failed to handle "+path);
 			}

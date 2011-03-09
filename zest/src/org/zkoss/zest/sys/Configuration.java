@@ -12,6 +12,8 @@ Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 */
 package org.zkoss.zest.sys;
 
+import org.zkoss.xel.FunctionMapper;
+
 /**
  * Represents the ZEST configuration.
  * @author tomyeh
@@ -30,4 +32,7 @@ public interface Configuration {
 	 * Then, the exception will be thrown up to the container.
 	 */
 	public ErrorHandler getErrorHandler();
+	/** Returns the function mapper defined in the configuration.
+	 */
+	public FunctionMapper getFunctionMapper();
 }

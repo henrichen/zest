@@ -12,6 +12,16 @@ Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 -->
 
 <zest>
+	<!-- Specifies a taglib that defines EL functions.
+	You could specify any number of taglibs if your EL expressions need
+	<taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"/>
+	-->
+	<!-- Specifies a method that can be used in EL
+	You could specify any number of methods if your EL expressions need
+	<xel-method prefix="c" name="forName" class="java.lang.Class"
+		signature="java.lang.Class forName(java.lang.String)"/>
+	-->
+
     <!-- Specifies the extension that ZEST shall handle.
     	Default: empty (means ZEST handles only paths without any extension)
     	To specify multiple extensions, you could separate them by comma.
