@@ -12,12 +12,15 @@ Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 */
 package org.zkoss.zest.sys;
 
+import java.util.Map;
+import java.util.Iterator;
 import java.net.URL;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.zkoss.lang.reflect.Fields;
 import org.zkoss.util.logging.Log;
 import org.zkoss.web.servlet.Servlets;
 import org.zkoss.web.util.resource.ServletContextLocator;
@@ -87,12 +90,14 @@ public class ZestManager {
 	public boolean action(HttpServletRequest request, HttpServletResponse response) {
 		if (_config == null)
 			return false;
-	
-		final ActionContext ac = new ActionContextImpl(request, _config.getFunctionMapper());
-		final String path = ac.getRequestPath();
-		if (extensionIgnored(path, _config.getExtensions()))
+
+		String s = request.getPathInfo();
+		if (s == null || s.length() == 0)
+			s = request.getServletPath();
+		if (extensionIgnored(s, _config.getExtensions()))
 			return false;
 
+		final ActionContext ac = new ActionContextImpl(request, _config.getFunctionMapper());
 		final ActionDefinition[] defs = _config.getActionDefinitions();
 		for (int j = 0; j < defs.length; ++j) {
 			final ActionDefinition def = defs[j];
@@ -101,11 +106,12 @@ public class ZestManager {
 				action = def.getAction(ac);
 				if (action != null) {
 					request.setAttribute("action", action);
+					coerceParameters(request, action);
 					final String result = def.execute(ac, action);
 					request.setAttribute("result", result);
 					final String uri = def.getView(ac, result);
 					if (uri == null)
-						throw new ZestException("URI not specified for "+action+" under result is "+result+", when handling "+path);
+						throw new ZestException("URI not specified for "+action+" under result is "+result+", when handling "+ac.getRequestPath());
 					Servlets.forward(_ctx, request, response, uri);
 					return true;
 				}
@@ -114,10 +120,30 @@ public class ZestManager {
 				if (errh != null)
 					ex = errh.onError(ac, action, ex);
 				if (ex != null)
-					throw ZestException.Aide.wrap(ex, "Failed to handle "+path);
+					throw ZestException.Aide.wrap(ex, "Failed to handle "+ac.getRequestPath());
 			}
 		}
 		return false;
+	}
+	/** Coerces the request's parameters to action's corresponding fields.
+	 */
+	protected void coerceParameters(HttpServletRequest request, Object action)
+	throws Exception {
+		for (Iterator it = request.getParameterMap().entrySet().iterator();
+		it.hasNext();) {
+			final Map.Entry me = (Map.Entry)it.next();
+			final String nm = (String)me.getKey();
+			final String[] vals = (String[])me.getValue();
+			for (int j = 0; j < vals.length; ++j) {
+				try {
+					Fields.setByCompound(action, nm, vals[j], true);
+				} catch (NoSuchMethodException ex) {
+					//ignored
+				} catch (Throwable ex) {
+					log.warningBriefly("Unable to set the value: "+nm+"="+vals[j], ex);
+				}
+			}
+		}
 	}
 	private static boolean extensionIgnored(String path, String[] allowed) {
 		if (allowed != null && allowed.length > 0) {

@@ -6,6 +6,7 @@
 <title>Hello World!</title>
 </head>
 <body>
-<h2>${result}</h2>
+<h2>${action.message}</h2>
+<p>${result}</p>
 </body>
 </html>
