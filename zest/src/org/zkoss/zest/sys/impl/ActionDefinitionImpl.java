@@ -13,16 +13,19 @@ Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 package org.zkoss.zest.sys.impl;
 
 import java.lang.reflect.Method;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import org.zkoss.lang.Classes;
 
 import org.zkoss.zest.ActionContext;
 import org.zkoss.zest.sys.ActionDefinition;
 import org.zkoss.zest.sys.ExValue;
+import org.zkoss.zest.ZestException;
 
 /**
  * The default implementation of {@link ActionDefinition}, used
@@ -60,11 +63,19 @@ public class ActionDefinitionImpl implements ActionDefinition {
 		if (!matcher.matches())
 			return null;
 
-		Object action = _klass.newInstance();
-		return action;
+		final List<String> matches = new LinkedList<String>();
+		for (int j = matcher.groupCount() + 1; --j >= 0;)
+			matches.add(0, matcher.group(j));
+		ac.getServletRequest().setAttribute("matches",
+			matches.toArray(new String[matches.size()]));
+
+		return _klass.newInstance();
 	}
 	public String execute(ActionContext ac, Object action) throws Exception {
 		final String mtdnm = (String)_method.getValue(ac);
+		if (mtdnm == null)
+			throw new ZestException("Method, "+_method+", required for "+action);
+
 		Method m1 = null, m2 = null;
 		try {
 			m1 = Classes.getMethodInPublic(action.getClass(), mtdnm,
