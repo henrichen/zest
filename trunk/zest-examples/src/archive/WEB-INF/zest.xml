@@ -43,9 +43,12 @@ Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 	</action>
 
 	<!-- A RESTful example
-	<action path="/rest" method="${request.method}"
-	class="org.zkoss.zest.examples.rest.RESTfulAction">
-		<result>/rest/Result.jsp</result>
-	</action>
 	-->
+	<xel-method prefix="c" name="toMethodName"
+			class="org.zkoss.zest.examples.rest.RESTfulAction"
+		signature="java.lang.String toMethodName(java.lang.String)"/>
+	<action path="/rest" method="${c:toMethodName(request.method)}"
+	class="org.zkoss.zest.examples.rest.RESTfulAction">
+		<result>/rest/RESTfulView.jsp</result>
+	</action>
 </zest>

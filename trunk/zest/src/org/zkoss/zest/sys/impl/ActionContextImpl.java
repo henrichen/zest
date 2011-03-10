@@ -76,7 +76,7 @@ public class ActionContextImpl implements ActionContext {
 	@Override
 	public Object evaluate(Expression expression)
 	throws XelException {
-		return null;
+		return expression.evaluate(newXelContext());
 	}
 
 	/** Returns the expression factory. */

@@ -91,7 +91,7 @@ public class ParserImpl implements Parser {
 		return new ConfigurationImpl(
 			defs.toArray(new ActionDefinition[defs.size()]),
 			exts != null ? exts: new String[] {""}, errh,
-			taglibs != null && !taglibs.isEmpty() ?
+			!taglibs.isEmpty() || !xelmtds.isEmpty() ?
 				Taglibs.getFunctionMapper(taglibs, null, xelmtds, loc): null);
 	}
 	//parse action
@@ -101,16 +101,13 @@ public class ParserImpl implements Parser {
 		noELnorEmpty("class", clsnm, el);
 		final Class<?> klass = Classes.forNameByThread(clsnm);
 		final Map<String, String> results = new HashMap<String, String>();
-		for (Iterator it = el.getElements("result").iterator(); it.hasNext();)
-			parseResult((Element)it.next(), results);
+		for (Iterator it = el.getElements("result").iterator(); it.hasNext();) {
+			final Element e = (Element)it.next();
+			results.put(e.getAttributeValue("name"), e.getText(true));
+		}
 		final String path = IDOMs.getRequiredAttributeValue(el, "path");
 		noELnorEmpty("path", path, el);
 		return new ActionDefinitionImpl(path, klass, el.getAttributeValue("method"), results);
-	}
-	private static void parseResult(Element el, Map<String, String> results) {
-		final String nm = el.getAttributeValue("name");
-		noELnorEmpty("name", nm, el);
-		results.put(nm, el.getText(true));
 	}
 	/** Parse the XEL method. */
 	private static void parseXelMethod(List<Object[]> xelmtds, Element el)
