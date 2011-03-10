@@ -19,7 +19,6 @@ package org.zkoss.zest;
  */
 public class Version {
 	/** The release version. The official version.
-	 * @since 3.0.0
 	 */
-	public static final String RELEASE = "0.8.0-FL";
+	public static final String RELEASE = "1.0.0-FL";
 }
