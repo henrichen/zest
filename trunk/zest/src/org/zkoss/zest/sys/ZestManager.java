@@ -60,27 +60,33 @@ public class ZestManager {
 	 */
 	public void init(ServletContext ctx, Parser parser) {
 		_ctx = ctx;
-
-		//load /WEB-INF/zest.xml
-		final String ZEST_XML = "/WEB-INF/zest.xml";
-		try {
-			final URL url = _ctx.getResource(ZEST_XML);
-			if (url == null) {
-				_config = null;
-				log.info("File not found: "+ ZEST_XML);
-			} else {
-				_config = parser.parse(url, new ServletContextLocator(_ctx));
-			}
-		} catch (Throwable ex) {
-			throw ZestException.Aide.wrap(ex, "Unable to load " + ZEST_XML);
-		}
-
+		loadConfiguration(parser, "/WEB-INF/zest.xml");
 		ctx.setAttribute(ATTR_MANAGER, this);
 		log.info("ZEST initialized");
 	}
 	/** Destroyes the manager.
 	 */
 	public void destroy() {
+	}
+	/** Loads the configuration.
+	 * This method is usually called automatically.
+	 * However, you could invoke it if you'd like to reload the configuration
+	 * (such as when you modify <code>/WEB-INF/zest.xml</code>)
+	 * @param configURI the URI of the configuration file, such as
+	 * (<code>/WEB-INF/zest.xml</code>).
+	 */
+	public void loadConfiguration(Parser parser, String configURI) {
+		try {
+			final URL url = _ctx.getResource(configURI);
+			if (url == null) {
+				_config = null;
+				log.info("File not found: "+ configURI);
+			} else {
+				_config = parser.parse(url, new ServletContextLocator(_ctx));
+			}
+		} catch (Throwable ex) {
+			throw ZestException.Aide.wrap(ex, "Unable to load " + configURI);
+		}
 	}
 	/** Handles the action.
 	 * It first identifies any action that matches the request, and then
@@ -106,7 +112,7 @@ public class ZestManager {
 				action = def.getAction(ac);
 				if (action != null) {
 					request.setAttribute("action", action);
-					coerceParameters(request, action);
+					coerceParameters(ac, action);
 					final String result = def.execute(ac, action);
 					request.setAttribute("result", result);
 					final String uri = def.getView(ac, result);
@@ -116,20 +122,20 @@ public class ZestManager {
 					return true;
 				}
 			} catch (Throwable ex) {
-				final ErrorHandler errh = _config.getErrorHandler();
-				if (errh != null)
-					ex = errh.onError(ac, action, ex);
-				if (ex != null)
-					throw ZestException.Aide.wrap(ex, "Failed to handle "+ac.getRequestPath());
+				try {
+					_config.getErrorHandler().onError(ac, action, ex);
+				} catch (Throwable t) {
+					throw ZestException.Aide.wrap(t, "Failed to handle "+ac.getRequestPath());
+				}
 			}
 		}
 		return false;
 	}
 	/** Coerces the request's parameters to action's corresponding fields.
 	 */
-	protected void coerceParameters(HttpServletRequest request, Object action)
-	throws Exception {
-		for (Iterator it = request.getParameterMap().entrySet().iterator();
+	protected void coerceParameters(ActionContext ac, Object action)
+	throws Throwable {
+		for (Iterator it = ac.getServletRequest().getParameterMap().entrySet().iterator();
 		it.hasNext();) {
 			final Map.Entry me = (Map.Entry)it.next();
 			final String nm = (String)me.getKey();
@@ -137,10 +143,9 @@ public class ZestManager {
 			for (int j = 0; j < vals.length; ++j) {
 				try {
 					Fields.setByCompound(action, nm, vals[j], true);
-				} catch (NoSuchMethodException ex) {
-					//ignored
 				} catch (Throwable ex) {
-					log.warningBriefly("Unable to set the value: "+nm+"="+vals[j], ex);
+					_config.getErrorHandler()
+						.onParamError(ac, action, nm, vals[j], ex);
 				}
 			}
 		}

@@ -32,7 +32,7 @@ public class ConfigurationImpl implements Configuration {
 	FunctionMapper mapper) {
 		_defs = defs != null ? defs: new ActionDefinition[0];
 		_exts = exts != null ? exts: new String[0];
-		_errh = errh;
+		_errh = errh != null ? errh: new ErrorHandlerImpl();
 		_mapper = mapper;
 	}
 	@Override
