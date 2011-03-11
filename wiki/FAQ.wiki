@@ -1,13 +1,12 @@
 #labels ZK,FAQ,Struts,MVC,REST
 * Why ZEST?
 
-ZEST is aimed to provide a lightweight and high-performance RESTful framework that enables MVC and REST for Web applications.
-
+ZEST is aimed to provide a lightweight and high-performance Web framework for Java that enables MVC and REST architectural pattern. 
 ZEST is also designed to work seamlessly with [http://www.zkoss.org ZK].
 
 * Why not [http://struts.apache.org/ Struts]?
 
-The MVC concept of ZEST is inspired from Struts. However, Struts is too complex. Many features are useless when working with a modern framework, such as [http://www.zkoss.org ZK].
+The MVC approach of ZEST is inspired from Struts. However, Struts is too complex. Many features are useless when working with a modern framework, such as [http://www.zkoss.org ZK].
 
 * Is ZEST suggested for ZK applications?
 
@@ -18,3 +17,9 @@ On the hand, you don't need ZEST if you prefer to work on ZUML files directly.
 * Does ZEST require ZK?
 
 No, it works with any Web framework. However, it requires two jar files from ZK, zcommon.jar and zweb.jar.
+
+* Why is the difference between ZEST's MVC and ZK's MVC?
+
+ZEST MVC is per-HTTP request. ZEST is implemented as a filter and then intercept each HTTP request. If an HTTP request matches, the corresponding MVC approach will be applied. 
+
+On the hand, [http://books.zkoss.org/wiki/ZK_Developer%27s_Reference/MVC ZK MVC] is _component-based_. MVC pattern could be applied to any portion of a UI, and MVC will be maintained across many HTTP requests, until the instance of a UI is no longer used.
