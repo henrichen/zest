@@ -20,5 +20,19 @@ import org.zkoss.zest.ActionContext;
  * @author tomyeh
  */
 public interface ErrorHandler {
-	public Throwable onError(ActionContext reqctx, Object action, Throwable ex);
+	/** Called when an exception is thrown.
+	 * If the error handler cannot handle it, it has to re-throw the exception.
+	 */
+	public void onError(ActionContext ac, Object action, Throwable ex)
+	throws Throwable;
+	/** Called when an exception is thrown when coercing a request parameter to be stored
+	 * in an action.
+	 * If the error handler cannot handle it, it has to re-throw the exception.
+	 * @param name the parameter's name
+	 * @param value the parameter's value
+	 * @param ex the exception being caught
+	 */
+	public void onParamError(ActionContext ac, Object action,
+	String name, String value, Throwable ex)
+	throws Throwable;
 }

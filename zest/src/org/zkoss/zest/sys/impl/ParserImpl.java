@@ -97,9 +97,6 @@ public class ParserImpl implements Parser {
 	//parse action
 	private static ActionDefinition parseAction(Element el)
 	throws Exception {
-		final String clsnm = IDOMs.getRequiredAttributeValue(el, "class");
-		noELnorEmpty("class", clsnm, el);
-		final Class<?> klass = Classes.forNameByThread(clsnm);
 		final Map<String, String> results = new HashMap<String, String>();
 		for (Iterator it = el.getElements("result").iterator(); it.hasNext();) {
 			final Element e = (Element)it.next();
@@ -107,7 +104,9 @@ public class ParserImpl implements Parser {
 		}
 		final String path = IDOMs.getRequiredAttributeValue(el, "path");
 		noELnorEmpty("path", path, el);
-		return new ActionDefinitionImpl(path, klass, el.getAttributeValue("method"), results);
+		return new ActionDefinitionImpl(path,
+			IDOMs.getRequiredAttributeValue(el, "class"),
+			el.getAttributeValue("method"), results);
 	}
 	/** Parse the XEL method. */
 	private static void parseXelMethod(List<Object[]> xelmtds, Element el)

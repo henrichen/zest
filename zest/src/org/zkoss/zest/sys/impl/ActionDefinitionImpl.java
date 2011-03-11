@@ -36,6 +36,7 @@ import org.zkoss.zest.ZestException;
 public class ActionDefinitionImpl implements ActionDefinition {
 	private Pattern _path;
 	private Class<?> _klass;
+	private ExValue _klassV;
 	private ExValue _method;
 	private Map<String, ExValue> _results;
 	/**
@@ -43,9 +44,32 @@ public class ActionDefinitionImpl implements ActionDefinition {
 	 * @param results a map of result to the view's URI
 	 */
 	public ActionDefinitionImpl(String path, Class<?> klass, String method,
-	Map<String, String> results) {
+	Map<String, String> results)
+	throws ClassNotFoundException {
+		this(path, klass, null, method, results);
+	}
+	/**
+	 * @param clsnm the class's name. EL is allowed.
+	 */
+	public ActionDefinitionImpl(String path, String clsnm, String method,
+	Map<String, String> results)
+	throws ClassNotFoundException {
+		this(path, null, clsnm, method, results);
+	}
+	private ActionDefinitionImpl(String path, Class<?> klass, String clsnm,
+	String method, Map<String, String> results)
+	throws ClassNotFoundException {
 		_path = Pattern.compile(path);
-		_klass = klass;
+		if (klass != null) {
+			_klass = klass;
+			_klassV = null;
+		} else if (clsnm.indexOf("${") < 0) {
+			_klass = Classes.forNameByThread(clsnm);
+			_klassV = null;
+		} else {
+			_klass = null;
+			_klassV = new ExValue(clsnm, Object.class);
+		}
 		_method = new ExValue(method != null ? method: "execute", String.class);
 
 		_results = new HashMap<String, ExValue>();
@@ -69,7 +93,17 @@ public class ActionDefinitionImpl implements ActionDefinition {
 		ac.getServletRequest().setAttribute("matches",
 			matches.toArray(new String[matches.size()]));
 
-		return _klass.newInstance();
+		Class<?> klass = _klass;
+		if (klass == null) {
+			Object c = _klassV.getValue(ac);
+			if (c instanceof Class<?>)
+				klass = (Class)c;
+			else if (c instanceof String)
+				klass = Classes.forNameByThread((String)c);
+			else
+				throw new ClassNotFoundException("Class expected in "+_klassV+", not "+c);
+		}
+		return klass.newInstance();
 	}
 	public String execute(ActionContext ac, Object action) throws Exception {
 		final String mtdnm = (String)_method.getValue(ac);
