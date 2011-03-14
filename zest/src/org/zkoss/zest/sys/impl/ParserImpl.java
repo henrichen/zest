@@ -89,7 +89,7 @@ public class ParserImpl implements Parser {
 			} else if ("variable-resolver".equals(elnm)) {
 				final String clsnm = IDOMs.getRequiredAttributeValue(el, "class");
 				noELnorEmpty("class", clsnm, el);
-				resolvers.add((VariableResolver)Classes.newInstanceByThread(clsnm));
+				resolvers.add(0, (VariableResolver)Classes.newInstanceByThread(clsnm)); //FILO
 			} else if ("xel-method".equals(elnm)) {
 				parseXelMethod(xelmtds, el);
 			}
