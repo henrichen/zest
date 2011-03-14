@@ -13,6 +13,7 @@ Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 package org.zkoss.zest.sys;
 
 import org.zkoss.xel.FunctionMapper;
+import org.zkoss.xel.VariableResolver;
 
 /**
  * Represents the ZEST configuration.
@@ -32,7 +33,12 @@ public interface Configuration {
 	 * Then, the exception will be thrown up to the container.
 	 */
 	public ErrorHandler getErrorHandler();
-	/** Returns the function mapper defined in the configuration.
+	/** Returns the function mapper defined in the configuration, or null
+	 * if not available.
 	 */
 	public FunctionMapper getFunctionMapper();
+	/** Returns the variable resolver defined in the configuration, or null
+	 * if not available.
+	 */
+	public VariableResolver getVariableResolver();
 }
