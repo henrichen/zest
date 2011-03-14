@@ -33,10 +33,11 @@ public class ActionContextImpl implements ActionContext {
 	private ExpressionFactory _expf;
 	private final HttpServletRequest _request;
 	private final FunctionMapper _mapper;
-	private final VariableResolver _resolver;
+	private final ActionResolver _resolver;
 	private final String _path;
 
-	public ActionContextImpl(HttpServletRequest request, FunctionMapper mapper) {
+	public ActionContextImpl(HttpServletRequest request,
+	VariableResolver resolver, FunctionMapper mapper) {
 		_request = request;
 		String path = request.getServletPath();
 		if (path == null || path.length() == 0)
@@ -52,12 +53,7 @@ public class ActionContextImpl implements ActionContext {
 		}
 		_path = path;
 		_mapper = mapper;
-		_resolver = new VariableResolver() {
-			public Object resolveVariable(String name) {
-				if ("request".equals(name)) return _request;
-				return _request.getAttribute(name);
-			}
-		};
+		_resolver = new ActionResolver(resolver);
 	}
 	@Override
 	public HttpServletRequest getServletRequest() {
@@ -99,5 +95,19 @@ public class ActionContextImpl implements ActionContext {
 	 */
 	private XelContext newXelContext() {
 		return new SimpleXelContext(getVariableResolver(), getFunctionMapper());
+	}
+
+	private class ActionResolver implements VariableResolver {
+		private final VariableResolver _resolver;
+		private ActionResolver(VariableResolver resolver) {
+			this._resolver = resolver;
+		}
+		public Object resolveVariable(String name) {
+			if ("request".equals(name))
+				return _request;
+			final Object o =_request.getAttribute(name);
+			return o != null ? o:
+				this._resolver != null ? this._resolver.resolveVariable(name): null;
+		}
 	}
 }

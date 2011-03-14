@@ -29,6 +29,7 @@ import org.zkoss.idom.Element;
 import org.zkoss.idom.Item;
 import org.zkoss.idom.input.SAXBuilder;
 import org.zkoss.idom.util.IDOMs;
+import org.zkoss.xel.VariableResolver;
 import org.zkoss.xel.taglib.Taglibs;
 import org.zkoss.xel.taglib.Taglib;
 import org.zkoss.xel.util.MethodFunction;
@@ -63,6 +64,7 @@ public class ParserImpl implements Parser {
 		final List<ActionDefinition> defs = new LinkedList<ActionDefinition>();
 		final List<Taglib> taglibs = new LinkedList<Taglib>();
 		final List<Object[]> xelmtds = new LinkedList<Object[]>();
+		final List<VariableResolver> resolvers = new LinkedList<VariableResolver>();
 		String[] exts = null;
 		ErrorHandler errh = null;
 		for (Iterator it = root.getElements().iterator(); it.hasNext();) {
@@ -84,6 +86,10 @@ public class ParserImpl implements Parser {
 				final String prefix = IDOMs.getRequiredAttributeValue(el, "prefix");
 				noELnorEmpty("prefix", prefix, el);
 				taglibs.add(new Taglib(prefix, uri));
+			} else if ("variable-resolver".equals(elnm)) {
+				final String clsnm = IDOMs.getRequiredAttributeValue(el, "class");
+				noELnorEmpty("class", clsnm, el);
+				resolvers.add((VariableResolver)Classes.newInstanceByThread(clsnm));
 			} else if ("xel-method".equals(elnm)) {
 				parseXelMethod(xelmtds, el);
 			}
@@ -91,6 +97,7 @@ public class ParserImpl implements Parser {
 		return new ConfigurationImpl(
 			defs.toArray(new ActionDefinition[defs.size()]),
 			exts != null ? exts: new String[] {""}, errh,
+			ChainedResolver.getVariableResolver(resolvers),
 			!taglibs.isEmpty() || !xelmtds.isEmpty() ?
 				Taglibs.getFunctionMapper(taglibs, null, xelmtds, loc): null);
 	}
@@ -159,5 +166,28 @@ public class ParserImpl implements Parser {
 	throws ZestException {
 		if (val != null && val.indexOf("${") >= 0)
 			throw new ZestException(nm+" does not support EL expressions, "+item.getLocator());
+	}
+}
+/*package*/ class ChainedResolver implements VariableResolver {
+	private VariableResolver[] _resolvers;
+	
+	/*package*/ static
+	VariableResolver getVariableResolver(List<VariableResolver> resolvers) {
+		int sz;
+		if (resolvers == null || (sz = resolvers.size()) == 0)
+			return null;
+		return new ChainedResolver(resolvers.toArray(new VariableResolver[sz]));
+	}
+	private ChainedResolver(VariableResolver[] resolvers) {
+		_resolvers = resolvers;
+	}
+	@Override
+	public Object resolveVariable(String name) {
+		for (int j = 0; j < _resolvers.length; ++j) {
+			final Object o = _resolvers[j].resolveVariable(name);
+			if (o != null)
+				return o;
+		}
+		return null;
 	}
 }

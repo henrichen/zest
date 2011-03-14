@@ -27,6 +27,7 @@ import org.zkoss.web.util.resource.ServletContextLocator;
 
 import org.zkoss.zest.ActionContext;
 import org.zkoss.zest.ZestException;
+import org.zkoss.zest.ParameterIgnored;
 import org.zkoss.zest.sys.impl.ActionContextImpl;
 
 /**
@@ -103,7 +104,8 @@ public class ZestManager {
 		if (extensionIgnored(s, _config.getExtensions()))
 			return false;
 
-		final ActionContext ac = new ActionContextImpl(request, _config.getFunctionMapper());
+		final ActionContext ac = new ActionContextImpl(request,
+			_config.getVariableResolver(), _config.getFunctionMapper());
 		final ActionDefinition[] defs = _config.getActionDefinitions();
 		for (int j = 0; j < defs.length; ++j) {
 			final ActionDefinition def = defs[j];
@@ -112,7 +114,8 @@ public class ZestManager {
 				action = def.getAction(ac);
 				if (action != null) {
 					request.setAttribute("action", action);
-					coerceParameters(ac, action);
+					if (!(action instanceof ParameterIgnored))
+						coerceParameters(ac, action);
 					final String result = def.execute(ac, action);
 					request.setAttribute("result", result);
 					final String uri = def.getView(ac, result);
