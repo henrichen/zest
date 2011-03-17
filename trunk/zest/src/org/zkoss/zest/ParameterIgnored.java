@@ -17,8 +17,9 @@ package org.zkoss.zest;
  * the request's paramters shall not be converted to the action.
  *
  * <p>If this interface is not implemented by an action (default),
- * the setter method with the same name of a parameter will be called
- * to store the parameter's value.
+ * ZEST will look for the setter method for each parameter, and then
+ * invoke the method to store the parameter's value.
+ * It is so-called the parameter conversion.
  *
  * @author tomyeh
  */
