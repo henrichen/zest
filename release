@@ -223,14 +223,6 @@ if [ "$target" == "official" ] || [ "$target" == "daily" ] ; then
 	rm -rf $binnm
 	rm -rf metainfo
 	rm -rf $srcnm
-
-	if [ "$target" == "official" ] ; then
-		#Prepare the doc
-		cd $maindir
-		$maindir/bin/javadoc "$javadocdir/zest"
-#		$maindir/bin/javadoc "$javadocdir/jsdoc"
-	fi
-
 	rm -rf $binnm
 
 	#Prepare the java doc
