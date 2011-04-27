@@ -7,7 +7,7 @@
 	<artifactId>zest</artifactId>
 	<packaging>jar</packaging>
 	<properties>
-		<zk.version>1.0.0.FL.20110310</zk.version>
+		<zk.version>1.0.0</zk.version>
 	</properties>
 	<version>1.0.0</version>
 	<name>ZK RESTful Framework</name>

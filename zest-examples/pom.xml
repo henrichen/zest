@@ -4,7 +4,7 @@
 	<groupId>org.zkoss.zk</groupId>
 	<artifactId>zktest</artifactId>
 	<properties>
-		<zk.version>1.0.0.FL.20110310</zk.version>
+		<zk.version>1.0.0</zk.version>
 		<zkel.version>1.1.0</zkel.version>
 		<bsh.version>2.0b4</bsh.version>
 		<servlet.version>2.3</servlet.version>
