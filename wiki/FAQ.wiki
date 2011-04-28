@@ -1,12 +1,12 @@
 #labels ZK,FAQ,Struts,MVC,REST
 * Why ZEST?
 
-ZEST is aimed to provide a lightweight and high-performance Web framework for Java that enables MVC and REST architectural pattern. 
+ZEST is aimed to provide a lightweight and high-performance Web framework for Java that enables MVC pattern and RESTful services. 
 ZEST is also designed to work seamlessly with [http://www.zkoss.org ZK].
 
 * Why not [http://struts.apache.org/ Struts]?
 
-The MVC approach of ZEST is inspired from Struts. However, Struts is too complex. Many features are useless when working with a modern framework, such as [http://www.zkoss.org ZK].
+The MVC approach of ZEST is inspired from Struts 2/WebWork. However, Struts is too complex. Many features are useless when working with a modern framework, such as [http://www.zkoss.org ZK].
 
 * Is ZEST suggested for ZK applications?
 
