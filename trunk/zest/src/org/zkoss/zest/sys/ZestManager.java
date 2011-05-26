@@ -34,6 +34,10 @@ import org.zkoss.zest.sys.impl.ActionContextImpl;
  * The core of ZEST that matches URL, instantiates actions, invokes actions and
  * forwards to a view.
  *
+ * <p>By default, the manager ignores a path if its extension does not
+ * match any of the allowed extensions. If you'd like more complex
+ * algorithm to decide which to ignore, you could override {@link pathIgnored}.
+ *
  * @author tomyeh
  */
 public class ZestManager {
@@ -69,6 +73,12 @@ public class ZestManager {
 	 */
 	public void destroy() {
 	}
+	/** Returns the servlet context that this manager is associated with
+	 * @since 1.0.1
+	 */
+	public ServletContext getServletContext() {
+		return _ctx;
+	}
 	/** Loads the configuration.
 	 * This method is usually called automatically.
 	 * However, you could invoke it if you'd like to reload the configuration
@@ -101,7 +111,7 @@ public class ZestManager {
 		String s = request.getPathInfo();
 		if (s == null || s.length() == 0)
 			s = request.getServletPath();
-		if (extensionIgnored(s, _config.getExtensions()))
+		if (pathIgnored(s, _config.getExtensions()))
 			return false;
 
 		final ActionContext ac = new ActionContextImpl(request,
@@ -153,22 +163,34 @@ public class ZestManager {
 			}
 		}
 	}
-	private static boolean extensionIgnored(String path, String[] allowed) {
-		if (allowed != null && allowed.length > 0) {
-			String ext = "";
-			for (int j = path.length(); --j >= 0;) {
-				final char cc = path.charAt(j);
-				if (cc == '.') {
-					ext = path.substring(j);
-					break;
-				}
-				if (cc == '/')
-					break; //no extension
+	private boolean pathIgnored(String path, String[] allowedExts) {
+		String ext = "";
+		for (int j = path.length(); --j >= 0;) {
+			final char cc = path.charAt(j);
+			if (cc == '.') {
+				ext = path.substring(j);
+				break;
 			}
-			for (int j = 0; j < allowed.length; ++j)
-				if (ext.equals(allowed[j]))
-					return false; //matached
+			if (cc == '/')
+				break; //no extension
 		}
+		return pathIgnored(path, ext, allowedExts);
+	}	
+	/** Returns whether the given path shall be ignored.
+	 * <p>Default: the path is ignored if the extension does not match one of
+	 * the given allowed extensions.
+	 * @param path the given path to test
+	 * @param extension the extension of the path (it is part of path).
+	 * It is an empty string if there is no extension.
+	 * @param allowedExts the allowed extension. If null or zero-length,
+	 * it means all paths are allowed.
+	 */
+	protected
+	boolean pathIgnored(String path, String extension, String[] allowedExts) {
+		if (allowedExts != null)
+			for (int j = 0; j < allowedExts.length; ++j)
+				if (extension.equals(allowedExts[j]))
+					return false; //matached
 		return true;
 	}
 }
