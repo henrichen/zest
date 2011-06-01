@@ -34,7 +34,8 @@ public interface ActionDefinition {
 	/** Returns the URI for the given result, or null if not matched.
 	 * @param result the result of the execution of an action.
 	 * It is the returned value of {@link #execute}.
+	 * @since 1.0.1
 	 */
-	public String getView(ActionContext ctx, String result)
+	public ViewInfo getViewInfo(ActionContext ctx, String result)
 	throws Exception ;
 }

@@ -13,6 +13,7 @@ Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 package org.zkoss.zest.sys.impl;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.zkoss.xel.XelContext;
 import org.zkoss.xel.FunctionMapper;
@@ -32,13 +33,16 @@ import org.zkoss.zest.ActionContext;
 public class ActionContextImpl implements ActionContext {
 	private ExpressionFactory _expf;
 	private final HttpServletRequest _request;
+	private final HttpServletResponse _response;
 	private final FunctionMapper _mapper;
 	private final ActionResolver _resolver;
 	private final String _path;
 
-	public ActionContextImpl(HttpServletRequest request,
+	public ActionContextImpl(
+	HttpServletRequest request, HttpServletResponse response,
 	VariableResolver resolver, FunctionMapper mapper) {
 		_request = request;
+		_response = response;
 		String path = request.getServletPath();
 		if (path == null || path.length() == 0)
 			path = "/"; //in case that some container might not follow spec
@@ -58,6 +62,10 @@ public class ActionContextImpl implements ActionContext {
 	@Override
 	public HttpServletRequest getServletRequest() {
 		return _request;
+	}
+	@Override
+	public HttpServletResponse getServletResponse() {
+		return _response;
 	}
 	@Override
 	public String getRequestPath() {

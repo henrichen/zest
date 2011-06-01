@@ -25,6 +25,7 @@ import org.zkoss.lang.Classes;
 import org.zkoss.zest.ActionContext;
 import org.zkoss.zest.sys.ActionDefinition;
 import org.zkoss.zest.sys.ExValue;
+import org.zkoss.zest.sys.ViewInfo;
 import org.zkoss.zest.ZestException;
 
 /**
@@ -38,13 +39,13 @@ public class ActionDefinitionImpl implements ActionDefinition {
 	private Class<?> _klass;
 	private ExValue _klassV;
 	private ExValue _method;
-	private Map<String, ExValue> _results;
+	private Map<String, ViewInfoProxy> _results;
 	/**
 	 * @param klass the class of the action
 	 * @param results a map of result to the view's URI
 	 */
 	public ActionDefinitionImpl(String path, Class<?> klass, String method,
-	Map<String, String> results)
+	Map<String, ViewInfoProxy> results)
 	throws ClassNotFoundException {
 		this(path, klass, null, method, results);
 	}
@@ -52,12 +53,12 @@ public class ActionDefinitionImpl implements ActionDefinition {
 	 * @param clsnm the class's name. EL is allowed.
 	 */
 	public ActionDefinitionImpl(String path, String clsnm, String method,
-	Map<String, String> results)
+	Map<String, ViewInfoProxy> results)
 	throws ClassNotFoundException {
 		this(path, null, clsnm, method, results);
 	}
 	private ActionDefinitionImpl(String path, Class<?> klass, String clsnm,
-	String method, Map<String, String> results)
+	String method, Map<String, ViewInfoProxy> results)
 	throws ClassNotFoundException {
 		_path = Pattern.compile(path);
 		if (klass != null) {
@@ -70,11 +71,9 @@ public class ActionDefinitionImpl implements ActionDefinition {
 			_klass = null;
 			_klassV = new ExValue(clsnm, Object.class);
 		}
-		_method = new ExValue(method != null ? method: "execute", String.class);
 
-		_results = new HashMap<String, ExValue>();
-		for (Map.Entry<String, String> me: results.entrySet())
-			_results.put(me.getKey(), new ExValue(me.getValue(), String.class));
+		_method = new ExValue(method != null ? method: "execute", String.class);
+		_results = new HashMap<String, ViewInfoProxy>(results);
 	}
 	public Object getAction(ActionContext ac) throws Exception {
 		String path = ac.getRequestPath();
@@ -119,10 +118,10 @@ public class ActionDefinitionImpl implements ActionDefinition {
 		}
 		return m1 != null ? (String)m1.invoke(action, ac): (String)m2.invoke(action);
 	}
-	public String getView(ActionContext ac, String result) throws Exception {
-		ExValue uri = _results.get(result);
-		if (uri == null && result != null)
-			uri = _results.get(null); //default view
-		return (String)uri.getValue(ac);
+	public ViewInfo getViewInfo(ActionContext ac, String result) throws Exception {
+		ViewInfoProxy vip = _results.get(result);
+		if (vip == null)
+			vip = _results.get(null); //default view
+		return vip.getViewInfo(ac);
 	}
 }

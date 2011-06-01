@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.zkoss.lang.reflect.Fields;
 import org.zkoss.util.logging.Log;
-import org.zkoss.web.servlet.Servlets;
+import org.zkoss.web.servlet.http.Https;
 import org.zkoss.web.util.resource.ServletContextLocator;
 
 import org.zkoss.zest.ActionContext;
@@ -114,7 +114,7 @@ public class ZestManager {
 		if (pathIgnored(s, _config.getExtensions()))
 			return false;
 
-		final ActionContext ac = new ActionContextImpl(request,
+		final ActionContext ac = new ActionContextImpl(request, response,
 			_config.getVariableResolver(), _config.getFunctionMapper());
 		final ActionDefinition[] defs = _config.getActionDefinitions();
 		for (int j = 0; j < defs.length; ++j) {
@@ -128,10 +128,25 @@ public class ZestManager {
 						coerceParameters(ac, action);
 					final String result = def.execute(ac, action);
 					request.setAttribute("result", result);
-					final String uri = def.getView(ac, result);
-					if (uri == null)
-						throw new ZestException("URI not specified for "+action+" under result is "+result+", when handling "+ac.getRequestPath());
-					Servlets.forward(_ctx, request, response, uri);
+					final ViewInfo viewInfo = def.getViewInfo(ac, result);
+					if (viewInfo == null)
+						throw new ZestException("No information specified for "+action+" under result is "+result+", when handling "+ac.getRequestPath());
+					switch (viewInfo.getViewType()) {
+					case REDIRECT:
+						Https.sendRedirect(_ctx, request, response, viewInfo.getURI(), null, 0);
+						break;
+					case ERROR:
+						final String msg = viewInfo.getErrorMessage();
+						if (msg != null)
+							response.sendError(viewInfo.getErrorCode(), msg);
+						else
+							response.sendError(viewInfo.getErrorCode());
+					case DONE:
+						break;
+					default:
+						Https.forward(_ctx, request, response, viewInfo.getURI());
+						break;
+					}
 					return true;
 				}
 			} catch (Throwable ex) {
@@ -184,6 +199,7 @@ public class ZestManager {
 	 * It is an empty string if there is no extension.
 	 * @param allowedExts the allowed extension. If null or zero-length,
 	 * it means all paths are allowed.
+	 * @since 1.0.1
 	 */
 	protected
 	boolean pathIgnored(String path, String extension, String[] allowedExts) {
