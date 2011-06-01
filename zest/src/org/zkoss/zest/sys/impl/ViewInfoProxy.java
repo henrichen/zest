@@ -62,6 +62,9 @@ public class ViewInfoProxy {
 		}
 		return new VI(type, uri, errCode, errMsg);
 	}
+	public String toString() {
+		return "[" + _type + ", " + _content + ']';
+	}
 
 	private static class VI implements ViewInfo {
 		private final ViewType _type;

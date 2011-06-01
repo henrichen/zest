@@ -108,7 +108,7 @@ public class ParserImpl implements Parser {
 		for (Iterator it = el.getElements("result").iterator(); it.hasNext();) {
 			final Element e = (Element)it.next();
 			results.put(e.getAttributeValue("name"),
-				new ViewInfoProxy(e.getAttributeValue("type"), el.getText(true)));
+				new ViewInfoProxy(e.getAttributeValue("type"), e.getText(true)));
 		}
 		final String path = IDOMs.getRequiredAttributeValue(el, "path");
 		noELnorEmpty("path", path, el);
