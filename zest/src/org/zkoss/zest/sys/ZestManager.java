@@ -36,7 +36,7 @@ import org.zkoss.zest.sys.impl.ActionContextImpl;
  *
  * <p>By default, the manager ignores a path if its extension does not
  * match any of the allowed extensions. If you'd like more complex
- * algorithm to decide which to ignore, you could override {@link pathIgnored}.
+ * algorithm to decide which to ignore, you could override {@link #pathIgnored}.
  *
  * @author tomyeh
  */
