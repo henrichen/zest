@@ -15,8 +15,10 @@ package org.zkoss.zest.sys;
 import java.util.Map;
 import java.util.Iterator;
 import java.net.URL;
+import java.io.IOException;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -104,7 +106,8 @@ public class ZestManager {
 	 * instantiates/invoke the matched action and forward to the view.
 	 * @return whether it is mapped to an action (and then handled).
 	 */
-	public boolean action(HttpServletRequest request, HttpServletResponse response) {
+	public boolean action(HttpServletRequest request, HttpServletResponse response)
+	throws ServletException, IOException {
 		if (_config == null)
 			return false;
 
@@ -152,6 +155,10 @@ public class ZestManager {
 			} catch (Throwable ex) {
 				try {
 					_config.getErrorHandler().onError(ac, action, ex);
+				} catch (ServletException t) {
+					throw (ServletException)t;
+				} catch (IOException t) {
+					throw (IOException)t;
 				} catch (Throwable t) {
 					throw ZestException.Aide.wrap(t, "Failed to handle "+ac.getRequestPath());
 				}
