@@ -13,6 +13,7 @@ Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 package org.zkoss.zest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.zkoss.xel.FunctionMapper;
 import org.zkoss.xel.VariableResolver;
@@ -35,6 +36,11 @@ public interface ActionContext {
 	/** Returns the request.
 	 */
 	public HttpServletRequest getServletRequest();
+	/** Returns the response.
+	 * @since 1.0.1
+	 */
+	public HttpServletResponse getServletResponse();
+
 	/** Returns the request's path (a concontenation of
 	 * HttpServletRequest.getServletPath() and getRequestPath()).
 	 */

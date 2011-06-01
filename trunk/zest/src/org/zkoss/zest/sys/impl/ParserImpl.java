@@ -104,10 +104,11 @@ public class ParserImpl implements Parser {
 	//parse action
 	private static ActionDefinition parseAction(Element el)
 	throws Exception {
-		final Map<String, String> results = new HashMap<String, String>();
+		final Map<String, ViewInfoProxy> results = new HashMap<String, ViewInfoProxy>();
 		for (Iterator it = el.getElements("result").iterator(); it.hasNext();) {
 			final Element e = (Element)it.next();
-			results.put(e.getAttributeValue("name"), e.getText(true));
+			results.put(e.getAttributeValue("name"),
+				new ViewInfoProxy(e.getAttributeValue("type"), el.getText(true)));
 		}
 		final String path = IDOMs.getRequiredAttributeValue(el, "path");
 		noELnorEmpty("path", path, el);
