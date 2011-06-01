@@ -122,6 +122,6 @@ public class ActionDefinitionImpl implements ActionDefinition {
 		ViewInfoProxy vip = _results.get(result);
 		if (vip == null)
 			vip = _results.get(null); //default view
-		return vip.getViewInfo(ac);
+		return vip != null ? vip.getViewInfo(ac): null;
 	}
 }
