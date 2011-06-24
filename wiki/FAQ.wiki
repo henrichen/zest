@@ -20,6 +20,8 @@ No, it works with any Web framework. However, it requires two jar files from ZK,
 
 * Why is the difference between ZEST's MVC and ZK's MVC?
 
-ZEST MVC is per-HTTP request. ZEST is implemented as a filter and then intercept each HTTP request. If an HTTP request matches, the corresponding MVC approach will be applied. 
+ZEST MVC is per-HTTP request. ZEST is implemented as a filter and then intercept and process each HTTP request. With ZK technology, each HTTP request is actually served by a ZUML page or a richlet.
 
-On the hand, [http://books.zkoss.org/wiki/ZK_Developer%27s_Reference/MVC ZK MVC] is _component-based_. MVC pattern could be applied to any portion of a UI, and MVC will be maintained across many HTTP requests, until the instance of a UI is no longer used.
+On the hand, [http://books.zkoss.org/wiki/ZK_Developer%27s_Reference/MVC ZK MVC] is the mechanism to handle the Ajax requests causing by user's access of a single ZUML page or a richlet It is _component-based_. ZK MVC could be applied to any part of the component tree of a given ZUML page.
+
+Simply put, you could consider ZEST as a mechanism to beutify URL of a ZUML page, and to pre-process the request before reaching a ZUML page. Then, ZK MVC takes place after the ZUML page has been served and rendered.
