@@ -76,7 +76,7 @@ public class ZestManager {
 	public void destroy() {
 	}
 	/** Returns the servlet context that this manager is associated with
-	 * @since 1.0.1
+	 * @since 1.1.0
 	 */
 	public ServletContext getServletContext() {
 		return _ctx;
@@ -206,7 +206,7 @@ public class ZestManager {
 	 * It is an empty string if there is no extension.
 	 * @param allowedExts the allowed extension. If null or zero-length,
 	 * it means all paths are allowed.
-	 * @since 1.0.1
+	 * @since 1.1.0
 	 */
 	protected
 	boolean pathIgnored(String path, String extension, String[] allowedExts) {

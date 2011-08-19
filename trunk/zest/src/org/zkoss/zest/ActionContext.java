@@ -37,7 +37,7 @@ public interface ActionContext {
 	 */
 	public HttpServletRequest getServletRequest();
 	/** Returns the response.
-	 * @since 1.0.1
+	 * @since 1.1.0
 	 */
 	public HttpServletResponse getServletResponse();
 
