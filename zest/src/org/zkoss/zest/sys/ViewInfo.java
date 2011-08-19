@@ -13,7 +13,7 @@ Copyright (C) 2011 Potix Corporation. All Rights Reserved.
 package org.zkoss.zest.sys;
 
 /** The information of the view.
- * @since 1.0.1
+ * @since 1.1.0
  * @author tomyeh
  */
 public interface ViewInfo {
@@ -32,7 +32,7 @@ public interface ViewInfo {
 	public String getErrorMessage();
 
 	/** The types of the view.
-	 * @since 1.0.1
+	 * @since 1.1.0
 	 */
 	public enum ViewType {
 		/** Forward to the given URI. */

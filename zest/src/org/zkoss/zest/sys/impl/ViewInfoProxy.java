@@ -21,7 +21,7 @@ import org.zkoss.zest.sys.ViewInfo.ViewType;
 /**
  * Used to hold {@link ViewInfo} and evaluate the EL expressions it might have.
  * @author tomyeh
- * @since 1.0.1
+ * @since 1.1.0
  */
 public class ViewInfoProxy {
 	private final ExValue _type;
