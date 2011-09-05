@@ -1,5 +1,5 @@
 D.ON=true
-javadoc=~/prj/javadoc
+javadoc=~/prj/javadoc-zest
 unzip=true
 debug=true
 optimize=true
