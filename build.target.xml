@@ -145,11 +145,7 @@ if="deploy.tomcat.required">
 <!-- ===== -->
 <!-- CLEAN -->
 <!-- ===== -->
-<target name="clean.bin" depends="config" if="clean.bin.required">
-	<delete quiet="true" dir="${bin.dir}"/>
-</target>
-
-<target name="clean" depends="clean.bin">
+<target name="clean">
 	<delete quiet="true" dir="${out.dir}"/>
 	<delete quiet="true" dir="${tmp.dir}"/>
 	<delete quiet="true" dir="${outv.dir}"/>
