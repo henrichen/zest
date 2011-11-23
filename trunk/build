@@ -78,10 +78,8 @@ dbgflag=$(grep '^D.ON' $setting)
 dbgflag=${dbgflag#D.ON=}
 if [ "$dbgflag" = "true" ] ; then
 	cmd=build.debug
-	jstrim=false
 elif [ "$dbgflag" = "false" ] ; then
 	cmd=build.release
-	jstrim=true
 else
 	echo D.ON in $setting must be either true or false -- not $dbgflag
 	exit 1
@@ -152,7 +150,6 @@ else
 		oflag="off"
 	fi
 fi
-echo "dflag=$dflag, oflag=$oflag"
 
 #-- Prepare define list
 dfnList=
@@ -365,19 +362,8 @@ function invoke_ant
 				fi
 			fi
 		fi
-
-		zipjslist=$(grep '^zipjs=' deploy)
-		zipjslist=${zipjslist#zipjs=}
-		zipcsslist=$(grep '^zipcss=' deploy)
-		zipcsslist=${zipcsslist#zipcss=}
 	else
 		deploy=unknown
-	fi
-	if [ "${zipjslist}" = "" ] ; then
-		zipjslist=_na_dir_
-	fi
-	if [ "${zipcsslist}" = "" ] ; then
-		zipcsslist=_na_dir_
 	fi
 
 	prjver="$(head -1 version)"
@@ -439,8 +425,6 @@ function invoke_ant
 		$doall -Dformat="$format" -Ddeploy="$deploy" \
 		-Dserver.libs="$server_libs" -Dstart.service="$start_service" \
 		-Dtomcat.home="$tomcat_home" \
-		-Djs.trim=$jstrim -Dzipjs=$zipjslist\
-		-Dzipcss=$zipcsslist\
 		-Dwar.libs="$war_libs" -Dbasedir=. \
 		-Dunzip.files="$unzip_files" \
 		-Dproject.name="$prjnm" -Dproject.title="$prjtitle" -Dproject.version="$prjver" \

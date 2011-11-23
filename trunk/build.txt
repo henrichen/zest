@@ -37,11 +37,6 @@ build.setting or build.setting.local
 		Controls whether to turn on D.ON
 	javadoc=~/prj/javadoc
 		Specifies where to store Java apidocs.
-	zipjs=true
-		Optional. Default false.
-		Controls whether to compress the JavaScript files.
-		Note: a JavaScript file is compress only if zipjs=true AND
-		it matches zipjs specified in the deploy file
 	unzip=true
 		Optional. Default: false.
 		Controls whether to unzip files when deploying war.
