@@ -91,26 +91,10 @@ if="deploy.tomcat.required">
 	<mkdir dir="${src.archive.dir}"/>
 	<mkdir dir="${codegen.archive.dir}"/>
 
-	<exec executable="bash" dir="." failonerror="true">
-		<arg value="${bin.dir}/zipjs"/>
-		<arg value="${dist.lib.ext.dir}/yuicompressor.jar"/>
-		<arg value="${dist.lib.ext.dir}/bsh.jar"/>
-		<arg value="${bin.dir}/rmcomment.java"/>
-		<arg value="${src.archive.dir}/${zipjs}"/>
-		<arg value="${codegen.archive.dir}/${zipjs}"/>
-	</exec>
-	
-	<exec executable="bash" dir="." failonerror="true">
-		<arg value="${bin.dir}/zipcss"/>
-		<arg value="${dist.lib.ext.dir}/yuicompressor.jar"/>
-		<arg value="${src.archive.dir}/${zipcss}"/>
-		<arg value="${codegen.archive.dir}/${zipcss}"/>
-	</exec>
-	
 	<jar jarfile="${out.dir}/${jar.name}" manifest="${manifest.mf}">
 		<fileset dir="${out.dir}" excludes="${exclude.list}"/>
 		<fileset dir="${src.archive.dir}" includes="**"
-		 excludes="META-INF/MANIFEST.MF, ${zipjs}/**, ${zipcss}/**"/>
+		 excludes="META-INF/MANIFEST.MF"/>
 		<fileset dir="${codegen.archive.dir}" includes="**"
 		 excludes="META-INF/MANIFEST.MF"/>
 	</jar>
