@@ -30,6 +30,7 @@ import org.zkoss.web.util.resource.ServletContextLocator;
 import org.zkoss.zest.ActionContext;
 import org.zkoss.zest.ZestException;
 import org.zkoss.zest.ParameterIgnored;
+import org.zkoss.zest.annotation.ActionType;
 import org.zkoss.zest.sys.impl.ActionContextImpl;
 
 /**
@@ -127,7 +128,7 @@ public class ZestManager {
 				action = def.getAction(ac);
 				if (action != null) {
 					request.setAttribute("action", action);
-					if (!(action instanceof ParameterIgnored))
+					if (!parameterIgnored(action))
 						coerceParameters(ac, action);
 					final String result = def.execute(ac, action);
 					request.setAttribute("result", result);
@@ -165,6 +166,12 @@ public class ZestManager {
 			}
 		}
 		return false;
+	}
+	private static boolean parameterIgnored(Object action) {
+		if (action instanceof ParameterIgnored)
+			return true;
+		ActionType annot = action.getClass().getAnnotation(ActionType.class);
+		return annot != null && annot.parameterIgnored();
 	}
 	/** Coerces the request's parameters to action's corresponding fields.
 	 */
